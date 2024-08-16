@@ -3,13 +3,12 @@ import fs from 'fs'
 import express from 'express'
 import { createServer } from 'http'
 import cors from 'cors'
-import { logger } from './config'
+import { logger, port } from './config'
 
 async function main() {
 	logger.info('Starting server...')
 
 	const app = express()
-	const port = process.env.PORT ?? 8000
 
 	app.use(express.json())
 	app.use(cors())

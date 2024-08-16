@@ -2,10 +2,11 @@ import winston, { transport } from 'winston'
 import dotenv from 'dotenv'
 import * as packageJson from '../package.json'
 
-const version = packageJson.version // get version from package.json
+const version = packageJson.version
 
-// Configure to read .env files
 dotenv.config()
+
+export const port = process.env.PORT || 3000
 
 const storeLogs = process.env.STORE_LOGS === 'true'
 
