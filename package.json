@@ -1,0 +1,30 @@
+{
+	"name": "fullstack-starter",
+	"version": "0.0.0",
+	"description": "",
+	"repository": "",
+	"author": "",
+	"license": "GPL-3.0",
+	"scripts": {
+		"build": "pnpm -F frontend build",
+		"dev": "pnpm -F frontend dev",
+		"dev:backend": "pnpm -F backend dev",
+		"preview": "pnpm -F frontend preview",
+		"start": "pnpm -F backend start",
+		"format": "prettier --write \"**/*.{vue,ts,js,json}\"",
+		"version": "lerna version --no-private",
+		"preinstall": "npx only-allow pnpm",
+		"prepare": "husky install"
+	},
+	"devDependencies": {
+		"husky": "^9.0.11",
+		"lerna": "^8.1.2",
+		"lint-staged": "^15.2.2",
+		"prettier": "^3.2.5"
+	},
+	"lint-staged": {
+		"**/*.{js,ts,json,scss,css,vue}": [
+			"prettier --write"
+		]
+	}
+}
