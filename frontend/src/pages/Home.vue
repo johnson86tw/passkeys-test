@@ -1,4 +1,50 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { startRegistration } from '@simplewebauthn/browser'
+import { ref } from 'vue'
+
+const username = ref('')
+
+const API_URL = 'http://localhost:3000'
+
+async function requestRegistrationOptions(username: string) {
+	const response = await fetch(API_URL + '/start-registering', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify({
+			username,
+		}),
+	}).then(res => res.json())
+
+	return response.data.options
+}
+
+async function onClickRegister() {
+	try {
+		const options = await requestRegistrationOptions(username.value)
+		console.log('options', options)
+
+		const registration = await startRegistration(options)
+
+		const response = await fetch(API_URL + '/register', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				username: username.value,
+				registration,
+			}),
+		}).then(res => res.json())
+
+		const { verified } = response.data
+		console.log('register verified', verified)
+	} catch (e) {
+		console.error(e)
+	}
+}
+</script>
 
 <template>
 	<div class="p-5 flex flex-col gap-5">
@@ -7,10 +53,10 @@
 
 			<div class="flex gap-2 items-center">
 				<label for="username">Username</label>
-				<input type="text" class="input" />
+				<input v-model="username" type="text" class="input" @keypress.enter="onClickRegister" />
 			</div>
 			<div>
-				<button class="btn">Register</button>
+				<button class="btn" @click="onClickRegister">Register</button>
 			</div>
 		</div>
 

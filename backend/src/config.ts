@@ -34,3 +34,5 @@ export const logger = winston.createLogger({
 	),
 	transports: transports,
 })
+
+export const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173'
