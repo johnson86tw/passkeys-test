@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { startRegistration } from '@simplewebauthn/browser'
 import { ref } from 'vue'
+import { startAuthentication, startRegistration } from '@simplewebauthn/browser'
 
-const username = ref('')
+const username = ref('johnson')
 
 const API_URL = 'http://localhost:3000'
 
-async function requestRegistrationOptions(username: string) {
+async function getRegistrationOptions(username: string) {
 	const response = await fetch(API_URL + '/start-registering', {
 		method: 'POST',
 		headers: {
@@ -17,13 +17,17 @@ async function requestRegistrationOptions(username: string) {
 		}),
 	}).then(res => res.json())
 
+	if (response.error) {
+		throw new Error(response.error)
+	}
+
 	return response.data.options
 }
 
 async function onClickRegister() {
 	try {
-		const options = await requestRegistrationOptions(username.value)
-		console.log('options', options)
+		const options = await getRegistrationOptions(username.value)
+		console.log('registration options', options)
 
 		const registration = await startRegistration(options)
 
@@ -38,10 +42,64 @@ async function onClickRegister() {
 			}),
 		}).then(res => res.json())
 
+		if (response.error) {
+			throw new Error(response.error)
+		}
+
 		const { verified } = response.data
 		console.log('register verified', verified)
 	} catch (e) {
 		console.error(e)
+		alert(e)
+	}
+}
+
+async function getAuthenticationOptions(username: string) {
+	const response = await fetch(API_URL + '/start-authenticating', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify({
+			username,
+		}),
+	}).then(res => res.json())
+
+	if (response.error) {
+		throw new Error(response.error)
+	}
+
+	return response.data.options
+}
+
+async function onClickLogin() {
+	try {
+		const options = await getAuthenticationOptions(username.value)
+		console.log('authentication options', options)
+
+		const authentication = await startAuthentication(options)
+
+		const response = await fetch(API_URL + '/authenticate', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				username: username.value,
+				authentication,
+			}),
+		}).then(res => res.json())
+
+		if (response.error) {
+			throw new Error(response.error)
+		}
+
+		const { verified } = response.data
+
+		alert('Authenticated: ' + verified)
+	} catch (e) {
+		console.error(e)
+		alert(e)
 	}
 }
 </script>
@@ -65,10 +123,10 @@ async function onClickRegister() {
 
 			<div class="flex gap-2 items-center">
 				<label for="username">Username</label>
-				<input type="text" class="input" />
+				<input v-model="username" type="text" class="input" @keypress.enter="onClickLogin" />
 			</div>
 			<div>
-				<button class="btn">Login</button>
+				<button class="btn" @click="onClickLogin">Login</button>
 			</div>
 		</div>
 	</div>

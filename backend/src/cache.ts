@@ -1,5 +1,3 @@
-import { logger } from './config'
-
 class ChallengeStore {
 	private store: { [userId: string]: string } = {}
 
@@ -29,4 +27,5 @@ class ChallengeStore {
 	}
 }
 
-export const challengeStore = new ChallengeStore()
+export const registerChallengeStore = new ChallengeStore()
+export const loginChallengeStore = new ChallengeStore()
